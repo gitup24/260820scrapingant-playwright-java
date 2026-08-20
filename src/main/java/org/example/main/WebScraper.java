@@ -1,21 +1,27 @@
+package org.example.main;
+
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.LoadState;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WebScraper {
+    // Initialize Playwright with proper configurations for scraping
     private final Playwright playwright;
     private final Browser browser;
-    private final Page page;
+    private final BrowserContext context;
+    protected final Page page;
 
     public WebScraper () {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
                 .setHeadless(true)
                 .setSlowMo(50));
-        page =  browser.newContext().newPage();
+        context = browser.newContext();
+        page = context.newPage();
     }
- public List<String> scrapeData(String url, String selector) {
+    // Method to extract data from a webpage
+    public List<String> scrapeData(String url, String selector) {
         List<String> results = new ArrayList<>();
         try {
             page.navigate(url);
@@ -28,12 +34,12 @@ public class WebScraper {
             System.err.println("Error scraping data: " + e.getMessage());
         }
         return results;
- }
-
-    public void close() {
-        if (page != null) page.close();
-        if (browser != null) browser.close();
-        if (playwright != null) playwright.close();
     }
 
+    public void close() {
+        page.close();
+        context.close();
+        browser.close();
+        playwright.close();
+    }
 }
